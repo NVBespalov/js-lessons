@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug property mutation example</title>
+    <script>
+        const user = undefined;
+    </script>
+    <script src="object-property-mutation.js" type="application/javascript"></script>
+</head>
+</head>
+<body>
+<script>
+    Promise.resolve(user).then(user.getFullName.bind(user)).then(console.log);
+</script>
+</body>
+</html>
