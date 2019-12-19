@@ -1,0 +1,20 @@
+{
+  "name": "js-lessons",
+  "version": "1.0.0",
+  "description": "nothing special here, just good old javascript",
+  "main": "index.js",
+  "scripts": {
+    "start": "node lib/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NVBespalov/js-lessons.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NVBespalov/js-lessons/issues"
+  },
+  "homepage": "https://github.com/NVBespalov/js-lessons#readme"
+}
