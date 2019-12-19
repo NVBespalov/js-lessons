@@ -123,7 +123,7 @@ const user = {
 
 Теперь, используя стек вызовов мы легко переходим в предыдущий вызов.
 
-https://avatars.mds.yandex.net/get-zen_doc/1712337/pub_5dfa41ddaad43600affd040a_5dfa477d3d0088a948b09cc1/scale_1200
+<img src="https://avatars.mds.yandex.net/get-zen_doc/1712337/pub_5dfa41ddaad43600affd040a_5dfa477d3d0088a948b09cc1/scale_1200" />
 
 иииии, победааааа ура.
 
