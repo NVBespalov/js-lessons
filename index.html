@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <title>Debug property mutation example</title>
     <script>
-        const user = undefined;
+        const user = {
+            firstName: 'Vasilij',
+            middleName: 'Alibabaevich',
+            lastName: 'Radner',
+            aka: 'Alibaba',
+            getFullName() {
+                return `${this.lastName} ${this.firstName.slice(0, 1)}. ${this.middleName.slice(0, 1)}.`
+            }
+        };
     </script>
     <script src="object-property-mutation.js" type="application/javascript"></script>
 </head>
