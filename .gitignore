@@ -1,3 +1,4 @@
-dist/
+# Default ignored files
 .idea
+dist/
 /js-lessons.iml
