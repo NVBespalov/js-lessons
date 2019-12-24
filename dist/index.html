@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script>
+
+        function readFile(file) {
+            const fileReader = new FileReader();
+            fileReader.onload = ({ target: { result } }) => fetch('/file', {
+                    method: 'POST',
+                    body: JSON.stringify({name: file.name, content: result.match(/;base64,(.+)$/)[1]})
+                });
+            fileReader.readAsDataURL(file);
+        }
+    </script>
 </head>
 <body>
-TESTING 1,2,3...
+    <input type="file" onchange="readFile(this.files[0])" />
 </body>
 </html>
