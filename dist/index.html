@@ -2,37 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script>
-
-        function readFile(file) {
-            const fileReader = new FileReader();
-            fileReader.onload = ({target: {result: body}}, method = 'POST') => {
-                const xhr = new XMLHttpRequest();
-                xhr.upload.addEventListener("progress", function(e) {
-                    debugger
-                    if (e.lengthComputable) {
-                        const percentage = Math.round((e.loaded * 100) / e.total);
-                        // self.ctrl.update(percentage);
-                        console.log(percentage)
-                    }
-                }, false);
-
-                xhr.upload.addEventListener("load", function(e){
-                    debugger
-                    // self.ctrl.update(100);
-                    // const canvas = self.ctrl.ctx.canvas;
-                    // canvas.parentNode.removeChild(canvas);
-                }, false);
-                xhr.open("POST", `/files/${file.name}`);
-                xhr.overrideMimeType('text/plain; charset=x-user-defined-binary');
-                xhr.send(body);
-            };
-            fileReader.readAsDataURL(file);
-        }
-    </script>
+    <title>Welcome to files app</title>
 </head>
 <body>
-<input onchange="readFile(this.files[0])" type="file"/>
+<a href="files">Files</a>
 </body>
 </html>

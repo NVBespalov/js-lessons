@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload File</title>
+    <script>
+        /**
+         * Simple Fetch Implementation with progress callback
+         * @param url - The server url
+         * @param method - The request method
+         * @param body - The body
+         * @param onProgress - The progress function
+         * @returns {Promise}
+         */
+        const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress) => new Promise((res, rej) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, url);
+            xhr.onload = res;
+            xhr.onerror = rej;
+            if (xhr.upload && onProgress) {
+                xhr.upload.onprogress = onProgress;
+            }
+            xhr.send(body);
+        });
+
+        /**
+         * @class ProgressBar
+         * @description Simple progress bar implementation
+         */
+        class ProgressBar {
+            disposeOnDone;
+            $container;
+            $progress;
+            template = `<progress max="100" min="0" value="0">
+                0% complete
+             </progress>`;
+
+            onProgress = ({loaded, total}) => {
+                const percentage = Math.round((loaded * 100) / total);
+                this.$progress.innerHTML = `${percentage} %`;
+                this.$progress.setAttribute('value', `${percentage}`);
+                if(this.disposeOnDone && percentage === 100) {
+                    this.dispose();
+                }
+            };
+
+            constructor({disposeOnDone = true, $container = document.querySelector('body')} = {}) {
+                this.disposeOnDone = disposeOnDone;
+                this.$container = $container;
+                this.$container.innerHTML += this.template;
+                this.$progress = document.querySelector('progress');
+            }
+
+            dispose() {
+                this.$container.removeChild(this.$progress);
+                this.$container = undefined;
+                this.$progress = undefined;
+            }
+        }
+
+        function upload(file) {
+            fetchWithProgress(`/files/${file.name}`, {method: 'POST', body: file}, (new ProgressBar()).onProgress)
+                .then(() => document.querySelector('input').value = '');
+        }
+    </script>
+</head>
+<body>
+<input onchange="upload(this.files[0])" type="file" multiple/>
+</body>
+</html>
