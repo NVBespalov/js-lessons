@@ -5,67 +5,35 @@
     <title>Upload File</title>
     <link href="index.css" rel="stylesheet" type="text/css">
 </head>
+<script>
+    const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress) => new Promise((res, rej) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.onload = res;
+        xhr.onerror = rej;
+        if (xhr.upload && onProgress) {
+            xhr.upload.onprogress = onProgress;
+        }
+        xhr.send(body);
+    });
+
+    function onProgress({loaded, total}) {
+        const percentage = Math.round((loaded * 100) / total);
+        document.querySelector('.progress progress').setAttribute('value', `${percentage}`);
+        if (percentage !== 100) {
+            document.querySelector('.progress .uploading-percentage').textContent = `Uploading... ${percentage}%`;
+            return;
+        }
+        document.querySelector('.progress .uploading-percentage').textContent = `Uploaded... ${percentage}%`;
+    }
+
+    function uploadFile(body) {
+        document.querySelector('.progress .name').textContent = body.name;
+        document.querySelector('.progress').style = 'display: flex';
+        fetchWithProgress(`/files/${body.name}`, { method: 'Post', body}, onProgress);
+    }
+</script>
 <body class="flex">
-<!--<script>-->
-<!--    /**-->
-<!--     * Simple Fetch Implementation with progress callback-->
-<!--     * @param url - The server url-->
-<!--     * @param method - The request method-->
-<!--     * @param body - The body-->
-<!--     * @param onProgress - The progress function-->
-<!--     * @returns {Promise}-->
-<!--     */-->
-<!--    const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress) => new Promise((res, rej) => {-->
-<!--        const xhr = new XMLHttpRequest();-->
-<!--        xhr.open(method, url);-->
-<!--        xhr.onload = res;-->
-<!--        xhr.onerror = rej;-->
-<!--        if (xhr.upload && onProgress) {-->
-<!--            xhr.upload.onprogress = onProgress;-->
-<!--        }-->
-<!--        xhr.send(body);-->
-<!--    });-->
-
-<!--    /**-->
-<!--     * @class ProgressBar-->
-<!--     * @description Simple progress bar implementation-->
-<!--     */-->
-<!--    class ProgressBar {-->
-<!--        disposeOnDone;-->
-<!--        $container;-->
-<!--        $progress;-->
-<!--        template = `<progress max="100" min="0" value="0">-->
-<!--                0% complete-->
-<!--             </progress>`;-->
-
-<!--        onProgress = ({loaded, total}) => {-->
-<!--            const percentage = Math.round((loaded * 100) / total);-->
-<!--            this.$progress.innerHTML = `${percentage} %`;-->
-<!--            this.$progress.setAttribute('value', `${percentage}`);-->
-<!--            if(this.disposeOnDone && percentage === 100) {-->
-<!--                this.dispose();-->
-<!--            }-->
-<!--        };-->
-
-<!--        constructor({disposeOnDone = true, $container = document.querySelector('body')} = {}) {-->
-<!--            this.disposeOnDone = disposeOnDone;-->
-<!--            this.$container = $container;-->
-<!--            this.$container.innerHTML += this.template;-->
-<!--            this.$progress = document.querySelector('progress');-->
-<!--        }-->
-
-<!--        dispose() {-->
-<!--            this.$container.removeChild(this.$progress);-->
-<!--            this.$container = undefined;-->
-<!--            this.$progress = undefined;-->
-<!--        }-->
-<!--    }-->
-
-<!--    function upload(file) {-->
-<!--        fetchWithProgress(`/files/${file.name}`, {method: 'POST', body: file}, (new ProgressBar()).onProgress)-->
-<!--            .then(() => document.querySelector('input').value = '');-->
-<!--    }-->
-<!--</script>-->
 <div class="file-upload flex column justify-content-space-around">
    <span class="title">
             File upload
@@ -75,20 +43,29 @@
         <div>
             Drag and drop or <a href="#">browse</a> your files
         </div>
-        <input type="file" />
+        <input type="file" onchange="uploadFile(this.files[0])"/>
     </div>
     <div class="progress flex">
         <img src="../images/icons8-jpg-50.png"/>
         <div class="flex column flex1 justify-content-stretch">
-            <span class="name">IMG_3892.jpg</span>
-            <progress class="progress-bar" max="100" value="72">0 %</progress>
+            <span class="name"></span>
+            <progress class="progress-bar" max="100" value="0">0 %</progress>
             <div class="flex justify-content-space-between">
                 <span class="uploading-file-size">5.7 MB of 7.8 MB</span>
-                <span class="uploading-percentage">Uploading... 72%</span>
+                <span class="uploading-percentage"></span>
             </div>
         </div>
     </div>
     <button class="done">DONE</button>
 </div>
 </body>
+<script>
+    document.querySelector('.file-upload .drop-zone').addEventListener('click', function ({target}) {
+        const $fileInput = document.querySelector('.file-upload .drop-zone input[type=file]');
+        if ($fileInput === target) {
+            return;
+        }
+        $fileInput.click();
+    });
+</script>
 </html>
