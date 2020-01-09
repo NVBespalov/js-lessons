@@ -2,10 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="index1.css">
+    <title>Basic JWT Example</title>
+    <link href="index.css" rel="stylesheet">
+
 </head>
 <body>
-TESTING 1,2,3...
+<form>
+    <label>
+        UserName: <input name="userName" required/>
+    </label>
+    <label>
+        Password: <input name="password" required type="password"/>
+    </label>
+    <input type="submit" value="LogIn">
+</form>
 </body>
+<script type="module">
+    import {fetchWithProgress} from './xhr.js';
+
+    const submit = event => {
+        event.preventDefault();
+        const {target: {userName: {value: userName}, password: {value: password}}} = event;
+        const headers = {'Content-Type': 'application/json'};
+        fetchWithProgress('/api/authenticate', {method: 'POST', body: {userName, password}, headers})
+            .then(({target: {response: body}}) => fetchWithProgress('/api/verify', {
+                method: 'POST',
+                body,
+                headers
+            }));
+    };
+    document.querySelector('form').addEventListener('submit', submit)
+</script>
 </html>
