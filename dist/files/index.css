@@ -1,0 +1,98 @@
+html {
+    height: 100%;
+    width: 100%;
+}
+body {
+    background-color: #F8F8FA;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-upload {
+    background-color: #fff;
+    border-radius: 6px;
+    align-items: center;
+    width: 370px;
+    height: 291px;
+    padding: 27px 60px 22px 60px;
+}
+
+.file-upload .title {
+    color: #484D56;
+    font-size: 24px;
+    text-align: center;
+}
+.file-upload .done {
+    height: 33px;
+    width: 220px;
+    background-color: #2191DE;
+    color: #fff;
+    border-radius: 19px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.file-upload .drop-zone {
+    border: dotted 1px #D6DAE0;
+    border-radius: 6px;
+    background-color: #F9F9FB;
+    padding: 20px 0 25px 0;
+    height: 75px;
+    width: 100%;
+    color: #B2B8C4;
+}
+.file-upload .drop-zone input {
+    display: none;
+}
+.file-upload .drop-zone img {
+    cursor: pointer;
+}
+
+.file-upload .progress {
+    width: 100%;
+}
+.file-upload .progress .name {
+    color: #5D616B;
+    font-size: 12px;
+}
+.file-upload .progress progress {
+    width: 100%;
+}
+.file-upload .progress .uploading-percentage {
+    color: #6AB1E7;
+    font-size: 12px;
+}
+.file-upload .progress .uploading-file-size {
+    color: #B2B8C4;
+    font-size: 12px;
+}
+
+.flex {
+    display: flex;
+}
+.flex .column {
+    flex-direction: column;
+}
+.flex .flex1 {
+    flex: 1;
+}
+.flex .align-items-stretch {
+    align-items: stretch;
+}
+.flex .align-items-center {
+    align-items: center;
+}
+.flex .justify-content-stretch {
+    justify-content: stretch;
+}
+.flex .justify-content-center {
+    justify-content: center;
+}
+.flex .justify-content-space-between {
+    justify-content: space-between;
+}
+.flex .justify-content-space-around {
+    justify-content: space-around;
+}
