@@ -7,3 +7,6 @@ let declaredVariableWithNumberType: number;
 declaredVariableWithNumberType = 10;
 // declaredVariableWithNumberType = ''; => Error: Assigned expression type "" is not assignable to type number
 
+let myArrVariable: number[];
+myArrVariable = [];
+myArrVariable.push(1);
