@@ -286,3 +286,6 @@ let myArrVariable = [1,'2',3];
 const myArrVariableElement = myArrVariable[0];
 typeof myArrVariableElement === 'number' ? myArrVariableElement.toFixed() : parseInt(myArrVariableElement, 10);
 ``` 
+
+Как вы понимаете чем больше потенциально возможных типов элементов тем больше этого кода нам придется писать.
+
