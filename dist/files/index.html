@@ -6,20 +6,22 @@
     <link href="index.css" rel="stylesheet" type="text/css">
 </head>
 <script>
-    const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress) => new Promise((res, rej) => {
+    const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress = null, onloadstart = null) => new Promise((res, rej) => {
         const xhr = new XMLHttpRequest();
         xhr.open(method, url);
         xhr.onload = res;
+        xhr.upload.onloadstart = onloadstart;
+        xhr.upload.onprogress = onProgress;
         xhr.onerror = rej;
-        if (xhr.upload && onProgress) {
-            xhr.upload.onprogress = onProgress;
-        }
         xhr.send(body);
     });
 
     function onProgress({loaded, total}) {
         const percentage = Math.round((loaded * 100) / total);
+        const formattedTotal = formatBytes(total);
+        const formattedLoaded = formatBytes(loaded);
         document.querySelector('.progress progress').setAttribute('value', `${percentage}`);
+        document.querySelector('.progress .uploading-file-size').textContent = `${formattedLoaded} of ${formattedTotal}`;
         if (percentage !== 100) {
             document.querySelector('.progress .uploading-percentage').textContent = `Uploading... ${percentage}%`;
             return;
@@ -27,11 +29,26 @@
         document.querySelector('.progress .uploading-percentage').textContent = `Uploaded... ${percentage}%`;
     }
 
-    function uploadFile(body) {
-        document.querySelector('.progress .name').textContent = body.name;
-        document.querySelector('.progress').style = 'display: flex';
-        fetchWithProgress(`/files/${body.name}`, { method: 'Post', body}, onProgress);
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const bytesInKb = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const exponent = Math.floor(Math.log(bytes) / Math.log(bytesInKb));
+        return `${parseFloat((bytes / Math.pow(bytesInKb, exponent)).toFixed(0))} ${sizes[exponent]}`;
     }
+    function onError({target: { status, statusText }}) {
+        alert(`${status} : ${statusText}`);
+    }
+    function uploadFile(body) {
+        fetchWithProgress(`/files/${body.name}`, { method: 'Post', body}, onProgress, (event) => {
+            document.querySelector('.progress .name').textContent = body.name;
+            document.querySelector('.progress').style = 'display: flex';
+        }).catch(onError);
+    }
+
+
+
+
 </script>
 <body class="flex">
 <div class="file-upload flex column justify-content-space-around">
@@ -51,8 +68,8 @@
             <span class="name"></span>
             <progress class="progress-bar" max="100" value="0">0 %</progress>
             <div class="flex justify-content-space-between">
-                <span class="uploading-file-size">5.7 MB of 7.8 MB</span>
-                <span class="uploading-percentage"></span>
+                <span class="uploading-file-size"></span>
+                <span class="uploading-percentage">Uploaded... 0%</span>
             </div>
         </div>
     </div>
