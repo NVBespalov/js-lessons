@@ -6,13 +6,15 @@
     <link href="index.css" rel="stylesheet" type="text/css">
 </head>
 <script>
-    const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress = null, onloadstart = null) => new Promise((res, rej) => {
+    const fetchWithProgress = (url, {method = 'GET', body} = {}, onProgress = null, onLoadStart = null) => new Promise((res, rej) => {
         const xhr = new XMLHttpRequest();
         xhr.open(method, url);
         xhr.onload = res;
-        xhr.upload.onloadstart = onloadstart;
-        xhr.upload.onprogress = onProgress;
         xhr.onerror = rej;
+        if (xhr.upload && onProgress) {
+            xhr.upload.onprogress = onProgress;
+            xhr.upload.onloadstart = onLoadStart;
+        }
         xhr.send(body);
     });
 
@@ -29,6 +31,17 @@
         document.querySelector('.progress .uploading-percentage').textContent = `Uploaded... ${percentage}%`;
     }
 
+    function uploadFile(body) {
+        fetchWithProgress(`/files/${body.name}`, {method: 'Post', body}, onProgress, onLoadStart(body));
+    }
+
+    function onLoadStart(file) {
+        return function() {
+            document.querySelector('.progress .name').textContent = file.name;
+            document.querySelector('.progress').style = 'display: flex';
+        }
+    }
+
     function formatBytes(bytes) {
         if (bytes === 0) return '0 Bytes';
         const bytesInKb = 1024;
@@ -36,19 +49,6 @@
         const exponent = Math.floor(Math.log(bytes) / Math.log(bytesInKb));
         return `${parseFloat((bytes / Math.pow(bytesInKb, exponent)).toFixed(0))} ${sizes[exponent]}`;
     }
-    function onError({target: { status, statusText }}) {
-        alert(`${status} : ${statusText}`);
-    }
-    function uploadFile(body) {
-        fetchWithProgress(`/files/${body.name}`, { method: 'Post', body}, onProgress, (event) => {
-            document.querySelector('.progress .name').textContent = body.name;
-            document.querySelector('.progress').style = 'display: flex';
-        }).catch(onError);
-    }
-
-
-
-
 </script>
 <body class="flex">
 <div class="file-upload flex column justify-content-space-around">
@@ -56,11 +56,11 @@
             File upload
         </span>
     <div class="drop-zone flex column justify-content-space-between align-items-center">
-        <img class="file-image" src="../images/icons8-add-file-48.png" />
+        <img class="file-image" src="../images/icons8-add-file-48.png"/>
         <div>
             Drag and drop or <a href="#">browse</a> your files
         </div>
-        <input type="file" onchange="uploadFile(this.files[0])"/>
+        <input onchange="uploadFile(this.files[0])" type="file"/>
     </div>
     <div class="progress flex">
         <img src="../images/icons8-jpg-50.png"/>
@@ -69,7 +69,7 @@
             <progress class="progress-bar" max="100" value="0">0 %</progress>
             <div class="flex justify-content-space-between">
                 <span class="uploading-file-size"></span>
-                <span class="uploading-percentage">Uploaded... 0%</span>
+                <span class="uploading-percentage"></span>
             </div>
         </div>
     </div>
