@@ -290,5 +290,29 @@ typeof myArrVariableElement === 'number' ? myArrVariableElement.toFixed() : pars
 Как вы понимаете чем больше потенциально возможных типов элементов тем больше этого кода нам придется писать. Нужно
 стремиться писать меньше кода. И больше реиспользовать.
 
-## 
+## Object
 
+Обьекты являются упорядоченными колекциями. Другими словами все свойства обьектов упорядоченным по именам ключей по возрастанию.
+Для того, чтобы определить обьектный тип достаточно присвоить обьект в переменную и механизм определения типов тайпскрипт
+сделает это за нас.
+
+```typescript
+const userVasya = {id: 'a10', firstName: 'Василий', middleName: 'Алибабаевич'};
+userVasya.aka = 'Алибаба';
+``` 
+
+Инструкция присваивания свойству aka вызывает ошибку `TS2339: Property 'aka' does not exist on type '{ id: string; firstName: string; middleName: string; }'`
+как видим тайпскрипт указывает на определенный тип - `{ id: string; firstName: string; middleName: string; }` и среди свойств нет свойства `aka`.
+Если тип обьекта получить из выражения не получается то мы можем указать обьектный тип вручную.
+
+```typescript
+const userVasya: { id: string; firstName: string; middleName: string; aka: string; } = {id: 'a10', firstName: 'Василий', middleName: 'Алибабаевич'};
+userVasya.aka = 'Алибаба';
+``` 
+Теперь инструкция присваивания свойства `aka` не вызывает ошибки. Зато правая часть оператора присваивания выражения в
+переменную `userVasya` вызывает ошибку `TS2741: Property 'aka' is missing in type '{ id: string; firstName: string; middleName: string; }' but required in type '{ id: string; firstName: string; middleName: string; aka: string; }'.`
+
+Обратим внимание на правую часть выражения. Среди свойств создаваемого обьекта нет свойства aka так как оно может быть
+не обязательным или поялвяться как в нашем случае с течением времени. Для этого в описании обьекта изменим описание
+свойства `aka` `{ id: string; firstName: string; middleName: string; aka?: string; }` вопросительный знак указывает на
+то, что это свойство опциональное и может присутствовать а может и нет. Я рекомендую из
