@@ -10,3 +10,6 @@ declaredVariableWithNumberType = 10;
 let myArrVariable: number[];
 myArrVariable = [];
 myArrVariable.push(1);
+
+const userVasya: { id: string; firstName: string; middleName: string; aka: string; } = {id: 'a10', firstName: 'Василий', middleName: 'Алибабаевич'};
+userVasya.aka = 'Алибаба';
