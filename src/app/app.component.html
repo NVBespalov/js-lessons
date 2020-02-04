@@ -1,0 +1,11 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <label>
+    First Name
+    <input formControlName="firstName"><br>
+    <span *ngIf="form.dirty && form.get('firstName').hasError('required')">This field is required</span>
+    <span *ngIf="form.dirty && form.get('firstName').hasError('minlength')">This field min length {{form.get('firstName').getError('minlength')?.requiredLength}} but you typed {{form.get('firstName').getError('minlength')?.actualLength}}</span>
+  </label><br>
+  {{form.get('firstName').errors | json}}
+  <label>Last Name <input formControlName="lastName"></label>
+  <button type="submit" [disabled]="form.invalid">Submit</button>
+</form>
