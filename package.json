@@ -4,7 +4,8 @@
   "description": "nothing special here, just good old javascript",
   "main": "index.js",
   "scripts": {
-    "start": "node lib/index.js"
+    "start": "node lib/index.js",
+    "test": "mocha lib/**/**.spec.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,9 @@
   "dependencies": {
     "ramda": "^0.27.0",
     "rxjs": "^6.5.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.1.0"
   }
 }
