@@ -1,0 +1,6 @@
+.row {
+    display: flex;
+}
+.tile {
+    margin: 5px;
+}
