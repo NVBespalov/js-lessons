@@ -1,0 +1,12 @@
+<button (click)="gameApi.start()">Start</button>
+<div *ngIf="gameApi.field$ | async as field" class="field">
+  <div *ngFor="let row of field; let rowIndex = index" class="row">
+      <app-cookie
+        [currentState]="gameApi.getAnimationState(rowIndex, nameIndex)"
+        *ngFor="let name of row; let nameIndex = index"
+        [name]="name"
+        [highlighted]="gameApi.isHighLighted(rowIndex, nameIndex)"
+        (select)="gameApi.highlight(rowIndex, nameIndex)"
+      ></app-cookie>
+  </div>
+</div>

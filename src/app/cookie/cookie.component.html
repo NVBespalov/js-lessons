@@ -1,0 +1,5 @@
+<img
+  [@changeState]="currentState"
+  [src]="gameApi.getCookieAssetName(name, highlighted)"
+  class="cookie shadow1"
+  (click)="select.emit()">
