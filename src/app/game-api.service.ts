@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
+import { flatMap, take, tap } from 'rxjs/operators';
 
 const getRndInteger = (range) => {
     const min = 0;
@@ -114,17 +114,25 @@ export class GameApiService {
             const columnChanged = sColumnIndex !== columnIndex && sRowIndex === rowIndex && availableColumn;
 
             if (columnChanged || rowChanged) {
+                // this.detectCollisions();
                 this.highlightSubject.next([...this.highlightSubject.getValue(), rowIndex, columnIndex]);
 
-                interval(1200).pipe(take(1)).subscribe(a => {
-                    this.detectCollisions();
-                    this.highlightSubject.next([]);
-                    // const fields = this.fieldSubject.getValue();
-                    // const next = fields[rowIndex][columnIndex];
-                    // fields[rowIndex][columnIndex] = fields[sRowIndex][sColumnIndex];
-                    // fields[sRowIndex][sColumnIndex] = next;
-                    // this.fieldSubject.next(JSON.parse(JSON.stringify(fields)));
-                });
+                this.highlightSubject
+                    .pipe(take(1))
+                    .pipe(flatMap(_ => interval(1200)))
+                    .pipe(take(1))
+                    .pipe(tap(a => {
+                        // const fields = this.fieldSubject.getValue();
+                        // const next = fields[rowIndex][columnIndex];
+                        // fields[rowIndex][columnIndex] = fields[sRowIndex][sColumnIndex];
+                        // fields[sRowIndex][sColumnIndex] = next;
+                        // this.fieldSubject.next(fields);
+                        this.highlightSubject.next([]);
+
+                    })).subscribe();
+
+
+
 
             }
 
@@ -136,7 +144,7 @@ export class GameApiService {
     private detectCollisions() {
         const direction = this.getMoveDirection();
         const [aR, aC, bR, bC] = this.highlightSubject.getValue();
-        let cookies = this.fieldSubject.getValue();
+        const cookies = this.fieldSubject.getValue();
         const aCookie = cookies[aR][aC];
         const bCookie = cookies[bR][bC];
 
@@ -150,7 +158,7 @@ export class GameApiService {
         const bright = cookies[aR][aC + 1];
         const bup = cookies[aR + 1][aC];
         const bhit = bCookie === bleft && bCookie === bright;
-        debugger;
+        // debugger;
     }
 
   private getMoveDirection() {

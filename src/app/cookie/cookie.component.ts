@@ -10,9 +10,7 @@ import { from, interval } from 'rxjs';
   animations: [
     trigger('changeState', [
       state('down', style({
-        transform: 'translateY(82px)',
-
-        background: 'green'
+        transform: 'translateY(82px)'
       })),
       state('up', style({
         transform: 'translateY(-82px)'
@@ -23,12 +21,11 @@ import { from, interval } from 'rxjs';
       state('right', style({
         transform: 'translateX(70px)'
       })),
-      transition(':enter', [
-        style({ transform: 'scale(0)' }),
-        animate('500ms')
-      ]),
-      transition('*=>down', animate('600ms')),
-      transition('*=>up', animate('600ms'))
+      // transition('', [
+      //   style({ transform: 'scale(0)' }),
+      //   animate('500ms')
+      // ]),
+      transition('*=>down, *=> up', animate('600ms')),
     ])
   ]
 })
