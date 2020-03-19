@@ -9,16 +9,26 @@ import { from, interval } from 'rxjs';
   styleUrls: ['./cookie.component.css'],
   animations: [
     trigger('changeState', [
-      state('state1', style({
-        // backgroundColor: 'green',
+      state('down', style({
+        transform: 'translateY(82px)',
+
+        background: 'green'
+      })),
+      state('up', style({
         transform: 'translateY(-82px)'
       })),
-      state('state2', style({
-        // backgroundColor: 'red',
-        transform: 'translateY(82px)'
+      state('left', style({
+        transform: 'translateX(-70px)'
       })),
-      transition('*=>state1', animate('600ms')),
-      transition('*=>state2', animate('600ms'))
+      state('right', style({
+        transform: 'translateX(70px)'
+      })),
+      transition(':enter', [
+        style({ transform: 'scale(0)' }),
+        animate('500ms')
+      ]),
+      transition('*=>down', animate('600ms')),
+      transition('*=>up', animate('600ms'))
     ])
   ]
 })
@@ -27,9 +37,7 @@ export class CookieComponent implements OnInit {
   @Input() highlighted: boolean;
   @Input() name;
   @Output() select = new EventEmitter();
-  constructor(public gameApi: GameApiService) {
-
-  }
+  constructor(public gameApi: GameApiService) {}
 
   ngOnInit(): void {
   }
