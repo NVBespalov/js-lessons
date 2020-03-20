@@ -5,12 +5,16 @@ import { AppComponent } from './app.component';
 import { EntriesPipe } from './entries.pipe';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CookieComponent } from './cookie/cookie.component';
+import { RowComponent } from './row/row.component';
+import { LevelComponent } from './level/level.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     EntriesPipe,
-    CookieComponent
+    CookieComponent,
+    RowComponent,
+    LevelComponent
   ],
   imports: [
     BrowserModule,

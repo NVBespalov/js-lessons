@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, interval } from 'rxjs';
-import { flatMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, from, interval, Observable } from 'rxjs';
+import { flatMap, take, tap, toArray } from 'rxjs/operators';
 
 const getRndInteger = (range) => {
     const min = 0;
@@ -17,7 +17,10 @@ export class GameApiService {
     private highlightSubject = new BehaviorSubject([]);
     public readonly highlight$ = this.highlightSubject.asObservable().pipe(tap(console.log));
     start = () => {
-        this.fieldSubject.next(this.shuffle());
+        let cookiesSprites = this.shuffle();
+        this.sprites$ = from<[number[]]>(cookiesSprites).pipe(flatMap(row => from(row))).pipe(toArray())
+        // this.fieldSubject.next(cookiesSprites);
+        // this.fields = cookiesSprites;
     };
     shuffle = (sx = 9, sy = 9, max = 4) => {
         const available = [...new Array(max + 1).keys()];
@@ -34,6 +37,8 @@ export class GameApiService {
                 }, [])];
             }, []);
     };
+    fields: [number[]];
+    private sprites$: Observable<number[]>;
 
     getAnimationState(row, column) {
 
@@ -115,18 +120,22 @@ export class GameApiService {
 
             if (columnChanged || rowChanged) {
                 // this.detectCollisions();
+
                 this.highlightSubject.next([...this.highlightSubject.getValue(), rowIndex, columnIndex]);
 
                 this.highlightSubject
                     .pipe(take(1))
-                    .pipe(flatMap(_ => interval(1200)))
-                    .pipe(take(1))
+                    // .pipe(flatMap(_ => interval(1200)))
+                    // .pipe(take(1))
                     .pipe(tap(a => {
-                        // const fields = this.fieldSubject.getValue();
-                        // const next = fields[rowIndex][columnIndex];
-                        // fields[rowIndex][columnIndex] = fields[sRowIndex][sColumnIndex];
+                        const fields = this.fields;
+                        const bCookie = fields[rowIndex][columnIndex];
+                        const next = bCookie;
+                        const aCookie = fields[sRowIndex][sColumnIndex];
+                        fields[rowIndex][columnIndex] = aCookie;
                         // fields[sRowIndex][sColumnIndex] = next;
                         // this.fieldSubject.next(fields);
+                        // this.highlightSubject.next([]);
                         this.highlightSubject.next([]);
 
                     })).subscribe();
