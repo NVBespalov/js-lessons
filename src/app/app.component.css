@@ -1,10 +1,15 @@
-.field {
+:host {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-
-.row {
-  display: flex;
-  flex-direction: row;
+.cat-thumbnail {
+  border: solid gray 3px;
 }
-
+.cat-thumbnail .text-content {
+  padding: 12px;
+}
+.cat-thumbnail .image {
+  width: 100%;
+}

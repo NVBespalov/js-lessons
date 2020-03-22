@@ -1,2 +1,11 @@
 <button (click)="gameApi.start()">Start</button>
-<app-level></app-level>
+<!--<app-level></app-level>-->
+<div class="list" [ngStyle]="gridStyles">
+    <app-cookie
+            *ngFor="let sprite of gameApi.field$ | async; let spriteIndex = index" [name]="sprite"
+            (select)="gameApi.highlight(spriteIndex)"
+            [highlighted]="gameApi.isHighLighted(spriteIndex)"
+    >
+        {{sprite}}
+    </app-cookie>
+</div>

@@ -31,17 +31,17 @@ import { from, interval } from 'rxjs';
             //   transform: 'translateX(70px)'
             // })),
             // transition('*=>down, *=> up', animate('600ms')),
-            transition(':enter', [
+            transition('void=>*', [
                 style({opacity: 0}),
                 animate('700ms', style({opacity: 1}))
             ]),
-            transition(':leave', [
+            transition('*=>void', [
                 style({opacity: 1}),
                 animate('7000ms', style({opacity: 0}))
             ])
         ])
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CookieComponent implements OnInit, OnDestroy {
     @Input() currentState: string;
@@ -56,6 +56,6 @@ export class CookieComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        debugger
+        // debugger
     }
 }

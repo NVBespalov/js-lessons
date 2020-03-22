@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, from, interval, Observable } from 'rxjs';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 import { flatMap, take, tap, toArray } from 'rxjs/operators';
 
 const getRndInteger = (range) => {
@@ -12,33 +12,31 @@ const getRndInteger = (range) => {
     providedIn: 'root'
 })
 export class GameApiService {
+    sx = 9;
+    sy = 9;
     private fieldSubject = new BehaviorSubject([]);
     readonly field$ = this.fieldSubject.asObservable().pipe(tap(console.log));
     private highlightSubject = new BehaviorSubject([]);
     public readonly highlight$ = this.highlightSubject.asObservable().pipe(tap(console.log));
+
+    sprites$: Observable<number[]>;
+
     start = () => {
-        let cookiesSprites = this.shuffle();
-        this.sprites$ = from<[number[]]>(cookiesSprites).pipe(flatMap(row => from(row))).pipe(toArray())
-        // this.fieldSubject.next(cookiesSprites);
-        // this.fields = cookiesSprites;
+        this.fieldSubject.next(this.shuffle(this.sx, this.sy));
     };
     shuffle = (sx = 9, sy = 9, max = 4) => {
         const available = [...new Array(max + 1).keys()];
-        return new Array(sx)
-            .fill(new Array(sy).fill(0))
-            .reduce((rows, row, rowIndex) => {
-                return [...rows, row.reduce((rowAcc, rowItem, index) => {
-                    const prevLeft = rowAcc[index - 1];
-                    const upperRow = rows[rowIndex - 1];
-                    if (upperRow && typeof upperRow[index] === 'number') {
-                        return [...rowAcc, getRndInteger(available.filter(a => a !== upperRow[index]).filter(a => a !== prevLeft))];
-                    }
-                    return [...rowAcc, getRndInteger(available.filter(a => a !== prevLeft))];
-                }, [])];
+        return new Array(sx * sy)
+            .fill(0)
+            .reduce((rows, cookieName, cookieIndex) => {
+                const prevLeft = cookieIndex - sy * Math.floor(cookieIndex / sy) > 0 && rows[cookieIndex - 1];
+                const upper = rows[cookieIndex - sy];
+                if (typeof upper === 'number') {
+                    return [...rows, getRndInteger(available.filter(a => a !== upper).filter(a => a !== prevLeft))];
+                }
+                return [...rows, getRndInteger(available.filter(a => a !== prevLeft))];
             }, []);
     };
-    fields: [number[]];
-    private sprites$: Observable<number[]>;
 
     getAnimationState(row, column) {
 
@@ -47,29 +45,29 @@ export class GameApiService {
         const isBCookie = bR === row && bC === column;
         const direction = this.getMoveDirection();
         if (isACookie && direction === 'right') {
-          return 'right';
+            return 'right';
         }
         if (isBCookie && direction === 'right') {
-          return 'left';
+            return 'left';
         }
         if (isACookie && direction === 'left') {
-          return 'left';
+            return 'left';
         }
         if (isBCookie && direction === 'left') {
-          return 'right';
+            return 'right';
         }
 
         if (isACookie && direction === 'up') {
-          return 'up';
+            return 'up';
         }
         if (isBCookie && direction === 'up') {
-          return 'down';
+            return 'down';
         }
         if (isACookie && direction === 'down') {
-          return 'down';
+            return 'down';
         }
         if (isBCookie && direction === 'down') {
-          return 'up';
+            return 'up';
         }
     }
 
@@ -97,50 +95,52 @@ export class GameApiService {
         return ['assets/cookies/', ...result].join('');
     };
 
-    isHighLighted(row, column) {
-        return this.highlightSubject.getValue()[0] === row && this.highlightSubject.getValue()[1] === column;
+    isHighLighted(row) {
+        return this.highlightSubject.getValue()[0] === row;
     }
 
-    highlight = (rowIndex, columnIndex) => {
-
-        const [sRowIndex, sColumnIndex] = this.highlightSubject.getValue();
-        if (rowIndex === sRowIndex && sColumnIndex === columnIndex) {
+    highlight = (index) => {
+debugger
+        const [aIndex, bIndex] = this.highlightSubject.getValue();
+        if (index === aIndex) {
             return this.highlightSubject.next([]);
         }
-        if (!sColumnIndex && !sRowIndex) {
-            return this.highlightSubject.next([rowIndex, columnIndex]);
+        if (!aIndex && !bIndex) {
+            return this.highlightSubject.next([index]);
         }
-        if (typeof sRowIndex === 'number' && typeof sColumnIndex === 'number') {
-            // this.highlightSubject.next([]);
-            const availableRow = sRowIndex - 1 === rowIndex || sRowIndex + 1 === rowIndex || sRowIndex === rowIndex;
-            const availableColumn = sColumnIndex - 1 === columnIndex || sColumnIndex + 1 === columnIndex || sColumnIndex === columnIndex;
+        if (typeof aIndex === 'number') {
 
-            const rowChanged = rowIndex !== sRowIndex && sColumnIndex === columnIndex && availableRow;
-            const columnChanged = sColumnIndex !== columnIndex && sRowIndex === rowIndex && availableColumn;
+            const columnChanged = aIndex - this.sy === index || aIndex + this.sy === index;
+            const rowChanged = aIndex + 1 === index || aIndex - 1 === index;
+
+
+            // const rowChanged = aIndex ;
+            // const columnChanged = sColumnIndex !== columnIndex && sRowIndex === rowIndex && availableColumn;
 
             if (columnChanged || rowChanged) {
+
                 // this.detectCollisions();
 
-                this.highlightSubject.next([...this.highlightSubject.getValue(), rowIndex, columnIndex]);
-
+                this.highlightSubject.next([aIndex, index]);
+                //
                 this.highlightSubject
                     .pipe(take(1))
                     // .pipe(flatMap(_ => interval(1200)))
                     // .pipe(take(1))
                     .pipe(tap(a => {
-                        const fields = this.fields;
-                        const bCookie = fields[rowIndex][columnIndex];
-                        const next = bCookie;
-                        const aCookie = fields[sRowIndex][sColumnIndex];
-                        fields[rowIndex][columnIndex] = aCookie;
+                        const fields = [...this.fieldSubject.getValue()];
+                        const bCookie = fields[index];
+                        const aCookie = fields[aIndex];
+                        // const next = bCookie;
+                        // const aCookie = fields[sRowIndex][sColumnIndex];
+                        fields[aIndex] = bCookie;
+                        fields[index] = aCookie;
                         // fields[sRowIndex][sColumnIndex] = next;
-                        // this.fieldSubject.next(fields);
+                        this.fieldSubject.next(fields);
                         // this.highlightSubject.next([]);
-                        this.highlightSubject.next([]);
+                        // this.highlightSubject.next([]);
 
                     })).subscribe();
-
-
 
 
             }
@@ -170,23 +170,23 @@ export class GameApiService {
         // debugger;
     }
 
-  private getMoveDirection() {
-    let [aR, aC, bR, bC] = this.highlightSubject.getValue();
-    if (aR !== bR) {
-      if (aR < bR) {
-        return 'down';
-      }
-      if (aR > bR) {
-        return 'up';
-      }
+    private getMoveDirection() {
+        let [aR, aC, bR, bC] = this.highlightSubject.getValue();
+        if (aR !== bR) {
+            if (aR < bR) {
+                return 'down';
+            }
+            if (aR > bR) {
+                return 'up';
+            }
+        }
+        if (aR === bR && aC !== bC) {
+            if (aC > bC) {
+                return 'left';
+            }
+            if (aC < bC) {
+                return 'right';
+            }
+        }
     }
-    if (aR === bR && aC !== bC) {
-      if (aC > bC) {
-        return 'left';
-      }
-      if (aC < bC) {
-        return 'right';
-      }
-    }
-  }
 }
