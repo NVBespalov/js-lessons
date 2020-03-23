@@ -2,9 +2,10 @@
 <!--<app-level></app-level>-->
 <div class="list" [ngStyle]="gridStyles">
     <app-cookie
-            *ngFor="let sprite of gameApi.field$ | async; let spriteIndex = index" [name]="sprite"
+            *ngFor="let sprite of gameApi.field$ | async; let spriteIndex = index; trackBy: trackByEmpCode" [name]="sprite"
             (select)="gameApi.highlight(spriteIndex)"
             [highlighted]="gameApi.isHighLighted(spriteIndex)"
+            [currentState]="gameApi.getAnimationState(spriteIndex)"
     >
         {{sprite}}
     </app-cookie>

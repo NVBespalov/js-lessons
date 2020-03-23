@@ -18,27 +18,20 @@ import { from, interval } from 'rxjs';
     styleUrls: ['./cookie.component.css'],
     animations: [
         trigger('changeState', [
-            // state('down', style({
-            //   transform: 'translateY(82px)'
-            // })),
-            // state('up', style({
-            //   transform: 'translateY(-82px)'
-            // })),
-            // state('left', style({
-            //   transform: 'translateX(-70px)'
-            // })),
-            // state('right', style({
-            //   transform: 'translateX(70px)'
-            // })),
-            // transition('*=>down, *=> up', animate('600ms')),
-            transition('void=>*', [
-                style({opacity: 0}),
-                animate('700ms', style({opacity: 1}))
-            ]),
-            transition('*=>void', [
-                style({opacity: 1}),
-                animate('7000ms', style({opacity: 0}))
-            ])
+            state('down', style({
+              transform: 'translateY(89px)'
+            })),
+            state('up', style({
+              transform: 'translateY(-89px)'
+            })),
+            state('left', style({
+              transform: 'translateX(-78px)'
+            })),
+            state('right', style({
+              transform: 'translateX(78px)'
+            })),
+            transition('*=>down, *=> up', animate('600ms')),
+
         ])
     ],
     // changeDetection: ChangeDetectionStrategy.OnPush

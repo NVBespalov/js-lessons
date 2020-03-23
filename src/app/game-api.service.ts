@@ -1,11 +1,29 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import { BehaviorSubject, from, interval, Observable } from 'rxjs';
 import { flatMap, take, tap, toArray } from 'rxjs/operators';
 
 const getRndInteger = (range) => {
     const min = 0;
     const max = range.length - 1;
     return range[Math.floor(Math.random() * (max - min + 1)) + min];
+};
+
+const take2ElementsRowLeft = (list, sX: number, sY: number, cookieIndex) => {
+    const prevLeft = cookieIndex - sY * Math.floor(cookieIndex / sY) > 0 && list[cookieIndex - 1];
+    const prev2Left = cookieIndex - sY * Math.floor(cookieIndex / sY) > 1 && list[cookieIndex - 2];
+    const result = [];
+    typeof prevLeft === 'number' && result.push(prevLeft);
+    typeof prev2Left === 'number' && result.push(prev2Left);
+    return result;
+};
+
+const take2ElementsRowRight = (list, sX: number, sY: number, cookieIndex) => {
+    const prevLeft = cookieIndex - sY * Math.floor(cookieIndex / sY) < sY && list[cookieIndex - 1];
+    const prev2Left = cookieIndex - sY * Math.floor(cookieIndex / sY) > 1 && list[cookieIndex - 2];
+    const result = [];
+    typeof prevLeft === 'number' && result.push(prevLeft);
+    typeof prev2Left === 'number' && result.push(prev2Left);
+    return result;
 };
 
 @Injectable({
@@ -38,12 +56,14 @@ export class GameApiService {
             }, []);
     };
 
-    getAnimationState(row, column) {
+    getAnimationState(index) {
 
-        const [aR, aC, bR, bC] = this.highlightSubject.getValue();
-        const isACookie = aR === row && aC === column;
-        const isBCookie = bR === row && bC === column;
+        const [aIndex, bIndex] = this.highlightSubject.getValue();
+
         const direction = this.getMoveDirection();
+        const isACookie = index === aIndex;
+        const isBCookie = bIndex === index;
+
         if (isACookie && direction === 'right') {
             return 'right';
         }
@@ -100,7 +120,7 @@ export class GameApiService {
     }
 
     highlight = (index) => {
-debugger
+
         const [aIndex, bIndex] = this.highlightSubject.getValue();
         if (index === aIndex) {
             return this.highlightSubject.next([]);
@@ -113,10 +133,6 @@ debugger
             const columnChanged = aIndex - this.sy === index || aIndex + this.sy === index;
             const rowChanged = aIndex + 1 === index || aIndex - 1 === index;
 
-
-            // const rowChanged = aIndex ;
-            // const columnChanged = sColumnIndex !== columnIndex && sRowIndex === rowIndex && availableColumn;
-
             if (columnChanged || rowChanged) {
 
                 // this.detectCollisions();
@@ -125,8 +141,8 @@ debugger
                 //
                 this.highlightSubject
                     .pipe(take(1))
-                    // .pipe(flatMap(_ => interval(1200)))
-                    // .pipe(take(1))
+                    .pipe(flatMap(_ => interval(1200)))
+                    .pipe(take(1))
                     .pipe(tap(a => {
                         const fields = [...this.fieldSubject.getValue()];
                         const bCookie = fields[index];
@@ -135,8 +151,9 @@ debugger
                         // const aCookie = fields[sRowIndex][sColumnIndex];
                         fields[aIndex] = bCookie;
                         fields[index] = aCookie;
-                        // fields[sRowIndex][sColumnIndex] = next;
-                        this.fieldSubject.next(fields);
+                        this.detectCollisions(fields)
+                        // // fields[sRowIndex][sColumnIndex] = next;
+                        // this.fieldSubject.next(fields);
                         // this.highlightSubject.next([]);
                         // this.highlightSubject.next([]);
 
@@ -150,43 +167,33 @@ debugger
     };
 
     // @TBD
-    private detectCollisions() {
+    private detectCollisions(fields) {
         const direction = this.getMoveDirection();
-        const [aR, aC, bR, bC] = this.highlightSubject.getValue();
-        const cookies = this.fieldSubject.getValue();
-        const aCookie = cookies[aR][aC];
-        const bCookie = cookies[bR][bC];
+        const [aIndex, bIndex] = this.highlightSubject.getValue();
 
-        // a => down
-        const aleft = cookies[bR][bC - 1];
-        const aright = cookies[bR][bC + 1];
-        const adown = cookies[bR - 1][bC];
-        const ahit = aCookie === aleft && aCookie === aright;
-        // b => up
-        const bleft = cookies[aR][aC - 1];
-        const bright = cookies[aR][aC + 1];
-        const bup = cookies[aR + 1][aC];
-        const bhit = bCookie === bleft && bCookie === bright;
-        // debugger;
+        const aCookie = fields[aIndex];
+        const bCookie = fields[bIndex];
+
+        if (direction === 'up' || direction === 'down') {
+            debugger
+            const upperLeft = takeNElementsRowLeft(fields, 2, this.sx, this.sy, aIndex > bIndex ? bIndex : aIndex)
+        }
     }
 
     private getMoveDirection() {
-        let [aR, aC, bR, bC] = this.highlightSubject.getValue();
-        if (aR !== bR) {
-            if (aR < bR) {
-                return 'down';
-            }
-            if (aR > bR) {
-                return 'up';
-            }
+        let [aIndex, bIndex] = this.highlightSubject.getValue();
+        if (aIndex - this.sy === bIndex) {
+            return 'up';
         }
-        if (aR === bR && aC !== bC) {
-            if (aC > bC) {
-                return 'left';
-            }
-            if (aC < bC) {
-                return 'right';
-            }
+        if (aIndex + this.sy === bIndex) {
+            return 'down';
         }
+        if (aIndex + 1 === bIndex) {
+            return 'right';
+        }
+        if (aIndex - 1 === bIndex) {
+            return 'left';
+        }
+
     }
 }
