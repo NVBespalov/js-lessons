@@ -8,7 +8,7 @@ const getRndInteger = (range) => {
     return range[Math.floor(Math.random() * (max - min + 1)) + min];
 };
 
-const take2ElementsRowLeft = (list, sX: number, sY: number, cookieIndex) => {
+const take2ElementsRowLeft = (list, sY: number, cookieIndex) => {
     const prevLeft = cookieIndex - sY * Math.floor(cookieIndex / sY) > 0 && list[cookieIndex - 1];
     const prev2Left = cookieIndex - sY * Math.floor(cookieIndex / sY) > 1 && list[cookieIndex - 2];
     const result = [];
@@ -17,14 +17,27 @@ const take2ElementsRowLeft = (list, sX: number, sY: number, cookieIndex) => {
     return result;
 };
 
-const take2ElementsRowRight = (list, sX: number, sY: number, cookieIndex) => {
-    const prevLeft = cookieIndex - sY * Math.floor(cookieIndex / sY) < sY && list[cookieIndex - 1];
-    const prev2Left = cookieIndex - sY * Math.floor(cookieIndex / sY) > 1 && list[cookieIndex - 2];
+const take2ElementsRowRight = (list, sY: number, cookieIndex) => {
+    const cookieRowPosition = sY * Math.floor(cookieIndex / sY);
+    const prevRight = cookieIndex - cookieRowPosition < sY - 1 && list[cookieIndex + 1];
+    const prev2Right = cookieIndex - cookieRowPosition < sY - 2 && list[cookieIndex + 2];
     const result = [];
-    typeof prevLeft === 'number' && result.push(prevLeft);
-    typeof prev2Left === 'number' && result.push(prev2Left);
+    typeof prevRight === 'number' && result.push(prevRight);
+    typeof prev2Right === 'number' && result.push(prev2Right);
     return result;
 };
+
+const take2ElementsRowTop = (list, sY: number, cookieIndex) => {
+
+    const prevTop = list[cookieIndex - sY];
+    const prev2Top = list[cookieIndex - sY * 2];
+    const result = [];
+    typeof prevTop === 'number' && result.push(prevTop);
+    typeof prev2Top === 'number' && result.push(prev2Top);
+    return result;
+};
+
+
 
 @Injectable({
     providedIn: 'root'
@@ -175,8 +188,10 @@ export class GameApiService {
         const bCookie = fields[bIndex];
 
         if (direction === 'up' || direction === 'down') {
+            const upperLeft = take2ElementsRowLeft(fields, this.sy, aIndex > bIndex ? bIndex : aIndex);
+            const upperRight = take2ElementsRowRight(fields, this.sy, aIndex > bIndex ? bIndex : aIndex);
+            const upperTop = take2ElementsRowTop(fields, this.sy, aIndex > bIndex ? bIndex : aIndex);
             debugger
-            const upperLeft = takeNElementsRowLeft(fields, 2, this.sx, this.sy, aIndex > bIndex ? bIndex : aIndex)
         }
     }
 
